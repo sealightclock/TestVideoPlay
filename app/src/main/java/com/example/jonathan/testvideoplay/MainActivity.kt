@@ -72,13 +72,32 @@ fun WebViewWithUrlInput() {
         }
 
         AndroidView(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxSize(),
             factory = { context ->
                 WebView(context).apply {
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    webViewClient = WebViewClient()
+                    settings.apply {
+                        javaScriptEnabled = true
+                        domStorageEnabled = true
+                        useWideViewPort = true
+                        loadWithOverviewMode = true
+                        builtInZoomControls = true
+                        displayZoomControls = false
+                        // Force mobile user-agent (optional)
+                        userAgentString = "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 " +
+                                "(KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36"
+                    }
+
+                    layoutParams = android.widget.FrameLayout.LayoutParams(
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+
+                    // Force initial scale
+                    setInitialScale(100)
+
                     webChromeClient = WebChromeClient()
+                    webViewClient = WebViewClient()
+
                     loadUrl(currentUrl)
                 }
             },
