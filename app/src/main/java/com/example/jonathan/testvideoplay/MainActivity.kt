@@ -49,7 +49,7 @@ fun WebViewWithUrlInput() {
 
     val sites = listOf(
         SiteInfo("YouTube", "https://www.youtube.com", Icons.Default.PlayArrow),
-        SiteInfo("ChatGPT", "https://chat.openai.com", Icons.Default.Info)
+        SiteInfo("News", "https://news.google.com/", Icons.Default.Info)
     )
 
     Column(modifier = Modifier.fillMaxSize()) {
