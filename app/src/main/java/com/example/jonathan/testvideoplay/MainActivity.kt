@@ -47,14 +47,12 @@ class MainActivity : ComponentActivity() {
 fun WebViewWithUrlInput() {
     var currentUrl by remember { mutableStateOf("https://www.youtube.com") }
 
-    // Define supported sites with labels and icons
     val sites = listOf(
         SiteInfo("YouTube", "https://www.youtube.com", Icons.Default.PlayArrow),
         SiteInfo("ChatGPT", "https://chat.openai.com", Icons.Default.Info)
     )
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Button row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -72,13 +70,15 @@ fun WebViewWithUrlInput() {
 
                 if (isSelected) {
                     Button(
-                        onClick = { currentUrl = site.url },
+                        onClick = { /* already selected, no action */ },
+                        enabled = false,
                         modifier = Modifier.weight(1f),
                         content = buttonContent
                     )
                 } else {
                     OutlinedButton(
                         onClick = { currentUrl = site.url },
+                        enabled = true,
                         modifier = Modifier.weight(1f),
                         content = buttonContent
                     )
@@ -86,7 +86,6 @@ fun WebViewWithUrlInput() {
             }
         }
 
-        // WebView
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { context ->
@@ -119,7 +118,6 @@ fun WebViewWithUrlInput() {
     }
 }
 
-// Helper data class for site info
 data class SiteInfo(
     val label: String,
     val url: String,
