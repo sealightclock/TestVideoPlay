@@ -10,10 +10,17 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -39,48 +47,46 @@ class MainActivity : ComponentActivity() {
 fun WebViewWithUrlInput() {
     var currentUrl by remember { mutableStateOf("https://www.youtube.com") }
 
+    // Define supported sites with labels and icons
+    val sites = listOf(
+        SiteInfo("YouTube", "https://www.youtube.com", Icons.Default.PlayArrow),
+        SiteInfo("ChatGPT", "https://chat.openai.com", Icons.Default.Info)
+    )
+
     Column(modifier = Modifier.fillMaxSize()) {
-        // Button row with proper modifier placement
+        // Button row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (currentUrl == "https://www.youtube.com") {
-                Button(
-                    onClick = { currentUrl = "https://www.youtube.com" },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("YouTube")
-                }
-            } else {
-                OutlinedButton(
-                    onClick = { currentUrl = "https://www.youtube.com" },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("YouTube")
-                }
-            }
+            sites.forEach { site ->
+                val isSelected = site.url == currentUrl
 
-            if (currentUrl == "https://chat.openai.com") {
-                Button(
-                    onClick = { currentUrl = "https://chat.openai.com" },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("ChatGPT")
+                val buttonContent: @Composable RowScope.() -> Unit = {
+                    Icon(site.icon, contentDescription = site.label)
+                    Spacer(Modifier.width(4.dp))
+                    Text(site.label)
                 }
-            } else {
-                OutlinedButton(
-                    onClick = { currentUrl = "https://chat.openai.com" },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("ChatGPT")
+
+                if (isSelected) {
+                    Button(
+                        onClick = { currentUrl = site.url },
+                        modifier = Modifier.weight(1f),
+                        content = buttonContent
+                    )
+                } else {
+                    OutlinedButton(
+                        onClick = { currentUrl = site.url },
+                        modifier = Modifier.weight(1f),
+                        content = buttonContent
+                    )
                 }
             }
         }
 
-        // WebView rendering
+        // WebView
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { context ->
@@ -108,9 +114,14 @@ fun WebViewWithUrlInput() {
                     loadUrl(currentUrl)
                 }
             },
-            update = { webView ->
-                webView.loadUrl(currentUrl)
-            }
+            update = { it.loadUrl(currentUrl) }
         )
     }
 }
+
+// Helper data class for site info
+data class SiteInfo(
+    val label: String,
+    val url: String,
+    val icon: ImageVector
+)
