@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,29 +40,47 @@ fun WebViewWithUrlInput() {
     var currentUrl by remember { mutableStateOf("https://www.youtube.com") }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Row of Buttons for navigation
+        // Button row with proper modifier placement
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Button(
-                onClick = { currentUrl = "https://www.youtube.com" },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("YouTube")
+            if (currentUrl == "https://www.youtube.com") {
+                Button(
+                    onClick = { currentUrl = "https://www.youtube.com" },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("YouTube")
+                }
+            } else {
+                OutlinedButton(
+                    onClick = { currentUrl = "https://www.youtube.com" },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("YouTube")
+                }
             }
 
-            Button(
-                onClick = { currentUrl = "https://chat.openai.com" },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("ChatGPT")
+            if (currentUrl == "https://chat.openai.com") {
+                Button(
+                    onClick = { currentUrl = "https://chat.openai.com" },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("ChatGPT")
+                }
+            } else {
+                OutlinedButton(
+                    onClick = { currentUrl = "https://chat.openai.com" },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("ChatGPT")
+                }
             }
         }
 
-        // WebView
+        // WebView rendering
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { context ->
