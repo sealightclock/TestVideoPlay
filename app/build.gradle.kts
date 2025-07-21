@@ -16,6 +16,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Make the built Apk run also on the "flightcase":
+        externalNativeBuild {
+            cmake {
+                abiFilters("arm64-v8a", "x86_64")
+            }
+        }
     }
 
     buildTypes {
