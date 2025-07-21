@@ -9,8 +9,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -86,7 +88,7 @@ fun WebViewWithUrlInput() {
                     OutlinedButton(
                         onClick = {
                             currentUrl = site.url
-                            // Do NOT update textFieldValue here
+                            // Do NOT update the text field
                         },
                         modifier = Modifier.fillMaxWidth(),
                         content = buttonContent
@@ -94,20 +96,32 @@ fun WebViewWithUrlInput() {
                 }
             }
 
-            // Text field remains user-controlled
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = textFieldValue,
-                onValueChange = {
-                    textFieldValue = it
-                    currentUrl = it.text
-                },
-                label = { Text("Enter URL") },
-                singleLine = true
-            )
+            // URL entry row: TextField + "Go" button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    value = textFieldValue,
+                    onValueChange = { textFieldValue = it },
+                    label = { Text("Enter URL") },
+                    singleLine = true
+                )
+                Button(
+                    onClick = { currentUrl = textFieldValue.text },
+                    modifier = Modifier
+                        .defaultMinSize(minWidth = 64.dp)
+                        .alignByBaseline()
+                ) {
+                    Text("Go")
+                }
+            }
         }
 
-        // WebView that updates with currentUrl
+        // WebView that follows currentUrl
         AndroidView(
             modifier = Modifier
                 .fillMaxSize()
