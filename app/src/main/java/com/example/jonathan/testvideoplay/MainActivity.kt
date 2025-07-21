@@ -54,12 +54,12 @@ fun WebViewWithUrlInput() {
     val sites = listOf(
         SiteInfo("YouTube", "https://www.youtube.com", Icons.Default.PlayArrow),
         SiteInfo("News", "https://news.google.com", Icons.Default.Info),
-        SiteInfo("ChatGPT", "https://chat.openai.com", Icons.Default.Search) // Updated icon
+        SiteInfo("ChatGPT", "https://chat.openai.com", Icons.Default.Search)
     )
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        // Buttons in vertical list
+        // Vertical button list
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -72,10 +72,7 @@ fun WebViewWithUrlInput() {
                 val buttonContent: @Composable RowScope.() -> Unit = {
                     Icon(site.icon, contentDescription = site.label)
                     Spacer(Modifier.width(4.dp))
-                    Text(
-                        site.label,
-                        fontSize = MaterialTheme.typography.labelLarge.fontSize // slightly smaller
-                    )
+                    Text(site.label, fontSize = MaterialTheme.typography.labelLarge.fontSize)
                 }
 
                 if (isSelected) {
@@ -89,7 +86,7 @@ fun WebViewWithUrlInput() {
                     OutlinedButton(
                         onClick = {
                             currentUrl = site.url
-                            textFieldValue = TextFieldValue(site.url)
+                            // Do NOT update textFieldValue here
                         },
                         modifier = Modifier.fillMaxWidth(),
                         content = buttonContent
@@ -97,7 +94,7 @@ fun WebViewWithUrlInput() {
                 }
             }
 
-            // Text field for user-entered URL
+            // Text field remains user-controlled
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = textFieldValue,
@@ -110,7 +107,7 @@ fun WebViewWithUrlInput() {
             )
         }
 
-        // WebView container
+        // WebView that updates with currentUrl
         AndroidView(
             modifier = Modifier
                 .fillMaxSize()
