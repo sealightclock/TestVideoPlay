@@ -1,6 +1,7 @@
 package com.example.jonathan.testvideoplay
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -59,48 +60,52 @@ fun WebViewWithUrlInput() {
         SiteInfo("ChatGPT", "https://chat.openai.com", Icons.Default.Search)
     )
 
+    val isPortrait =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+
     Column(modifier = Modifier.fillMaxSize()) {
 
-        // Vertical button list
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            sites.forEach { site ->
-                val isSelected = site.url == currentUrl
-
-                val buttonContent: @Composable RowScope.() -> Unit = {
-                    Icon(site.icon, contentDescription = site.label)
-                    Spacer(Modifier.width(4.dp))
-                    Text(site.label, fontSize = MaterialTheme.typography.labelLarge.fontSize)
-                }
-
-                if (isSelected) {
-                    Button(
-                        onClick = { /* already selected */ },
-                        enabled = false,
-                        modifier = Modifier.fillMaxWidth(),
-                        content = buttonContent
-                    )
-                } else {
-                    OutlinedButton(
-                        onClick = {
-                            currentUrl = site.url
-                            // Do NOT update the text field
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        content = buttonContent
+        // [1] Adaptive button layout
+        if (isPortrait) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                sites.forEach { site ->
+                    SiteButton(
+                        site = site,
+                        selectedUrl = currentUrl,
+                        onSelect = { currentUrl = it }, // ✅ FIXED
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
-
-            // URL entry row: TextField + "Go" button
+        } else {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                sites.forEach { site ->
+                    SiteButton(
+                        site = site,
+                        selectedUrl = currentUrl,
+                        onSelect = { currentUrl = it }, // ✅ FIXED
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+
+        // [2] Adaptive text field + Go button
+        if (isPortrait) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
@@ -112,20 +117,39 @@ fun WebViewWithUrlInput() {
                 )
                 Button(
                     onClick = { currentUrl = textFieldValue.text },
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = 64.dp)
-                        .alignByBaseline()
+                    modifier = Modifier.alignByBaseline()
+                ) {
+                    Text("Go")
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.weight(0.75f),
+                    value = textFieldValue,
+                    onValueChange = { textFieldValue = it },
+                    label = { Text("Enter URL") },
+                    singleLine = true
+                )
+                Button(
+                    onClick = { currentUrl = textFieldValue.text },
+                    modifier = Modifier.weight(0.25f)
                 ) {
                     Text("Go")
                 }
             }
         }
 
-        // WebView that follows currentUrl
+        // WebView
         AndroidView(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 8.dp),
+                .padding(top = 4.dp),
             factory = { context ->
                 WebView(context).apply {
                     settings.apply {
@@ -153,6 +177,37 @@ fun WebViewWithUrlInput() {
                 }
             },
             update = { it.loadUrl(currentUrl) }
+        )
+    }
+}
+
+@Composable
+fun SiteButton(
+    site: SiteInfo,
+    selectedUrl: String,
+    onSelect: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isSelected = site.url == selectedUrl
+
+    val buttonContent: @Composable RowScope.() -> Unit = {
+        Icon(site.icon, contentDescription = site.label)
+        Spacer(Modifier.width(4.dp))
+        Text(site.label, fontSize = MaterialTheme.typography.labelLarge.fontSize)
+    }
+
+    if (isSelected) {
+        Button(
+            onClick = {},
+            enabled = false,
+            modifier = modifier,
+            content = buttonContent
+        )
+    } else {
+        OutlinedButton(
+            onClick = { onSelect(site.url) },
+            modifier = modifier,
+            content = buttonContent
         )
     }
 }
